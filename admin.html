@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #111;
+  color: white;
+  padding: 20px;
+}
+
+h1 { text-align: center; }
+
+.box {
+  background: #1c1c1c;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+button {
+  background: #6a00ff;
+  color: white;
+  cursor: pointer;
+}
+
+.equipo {
+  display: flex;
+  justify-content: space-between;
+  background: #222;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+
+.eliminar {
+  background: red;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Panel Admin</h1>
+
+<!-- EQUIPOS -->
+<div class="box">
+  <h3>Agregar Equipo</h3>
+
+  <select id="serie">
+    <option>Sub-13</option>
+    <option>Sub-15</option>
+    <option>Sub-17</option>
+    <option>Primera</option>
+    <option>Segunda</option>
+    <option>Senior</option>
+  </select>
+
+  <input type="text" id="nombre" placeholder="Nombre del equipo">
+  <input type="text" id="logo" placeholder="URL del logo">
+  <input type="color" id="color">
+
+  <button onclick="agregarEquipo()">Agregar equipo</button>
+</div>
+
+<div class="box">
+  <h3>Equipos</h3>
+  <div id="lista"></div>
+</div>
+
+<!-- PARTIDOS -->
+<div class="box">
+  <h3>Crear Partido</h3>
+
+  <select id="seriePartido"></select>
+
+  <select id="equipoA"></select>
+  <input type="number" id="golesA" placeholder="Goles equipo A">
+
+  <select id="equipoB"></select>
+  <input type="number" id="golesB" placeholder="Goles equipo B">
+
+  <input type="datetime-local" id="fechaPartido">
+
+  <select id="tipo">
+    <option value="normal">Resultado normal</option>
+    <option value="woA">W.O. pierde equipo A</option>
+    <option value="woB">W.O. pierde equipo B</option>
+  </select>
+
+  <button onclick="crearPartido()">Guardar partido</button>
+</div>
+
+<div class="box">
+  <h3>Lista de Partidos</h3>
+
+  <select id="filtroSerie">
+    <option value="todas">Todas</option>
+    <option>Sub-13</option>
+    <option>Sub-15</option>
+    <option>Sub-17</option>
+    <option>Primera</option>
+    <option>Segunda</option>
+    <option>Senior</option>
+  </select>
+
+  <div id="listaPartidos"></div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBOHkkkQsDMcL9OxXjKg9YMcC6xM7kke1Q",
+  authDomain: "liga-davila.firebaseapp.com",
+  projectId: "liga-davila",
+  storageBucket: "liga-davila.firebasestorage.app",
+  messagingSenderId: "674533365203",
+  appId: "1:674533365203:web:841cbe1f23f1efb6230b26"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const SERIES = ["Sub-13","Sub-15","Sub-17","Primera","Segunda","Senior"];
+
+// llenar select
+SERIES.forEach(s => {
+  document.getElementById("seriePartido").innerHTML += `<option>${s}</option>`;
+});
+
+// AGREGAR EQUIPO
+window.agregarEquipo = async function () {
+  const nombre = document.getElementById("nombre").value;
+  const serie = document.getElementById("serie").value;
+  const logo = document.getElementById("logo").value;
+  const color = document.getElementById("color").value;
+
+  if (!nombre) return alert("Falta nombre");
+
+  await addDoc(collection(db, "equipos"), {
+    nombre, serie, logo, color
+  });
+
+  document.getElementById("nombre").value = "";
+  cargarEquipos();
+};
+
+// LISTA EQUIPOS
+async function cargarEquipos() {
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  const snap = await getDocs(collection(db, "equipos"));
+
+  snap.forEach(d => {
+    const data = d.data();
+
+    lista.innerHTML += `
+      <div class="equipo">
+        ${data.nombre} (${data.serie})
+        <span class="eliminar" onclick="eliminar('${d.id}')">X</span>
+      </div>
+    `;
+  });
+}
+
+// ELIMINAR
+window.eliminar = async function(id) {
+  await deleteDoc(doc(db, "equipos", id));
+  cargarEquipos();
+};
+
+// CARGAR SELECT
+async function cargarSelectEquipos() {
+  const serie = document.getElementById("seriePartido").value;
+
+  const eqA = document.getElementById("equipoA");
+  const eqB = document.getElementById("equipoB");
+
+  eqA.innerHTML = "";
+  eqB.innerHTML = "";
+
+  const snap = await getDocs(collection(db, "equipos"));
+
+  snap.forEach(d => {
+    const data = d.data();
+    if (data.serie === serie) {
+      eqA.innerHTML += `<option>${data.nombre}</option>`;
+      eqB.innerHTML += `<option>${data.nombre}</option>`;
+    }
+  });
+}
+
+// CREAR PARTIDO
+window.crearPartido = async function () {
+  const serie = document.getElementById("seriePartido").value;
+  const A = document.getElementById("equipoA").value;
+  const B = document.getElementById("equipoB").value;
+
+  let ga = parseInt(document.getElementById("golesA").value);
+  let gb = parseInt(document.getElementById("golesB").value);
+
+  const tipo = document.getElementById("tipo").value;
+  const fechaInput = document.getElementById("fechaPartido").value;
+
+  const fecha = fechaInput ? new Date(fechaInput).getTime() : Date.now();
+
+  if (A === B) return alert("Equipos iguales");
+
+  if (tipo === "woA") { ga = 0; gb = 3; }
+  if (tipo === "woB") { ga = 3; gb = 0; }
+
+  await addDoc(collection(db, "partidos"), {
+    serie, equipoA: A, equipoB: B, ga, gb, tipo, fecha
+  });
+
+  alert("Partido guardado");
+
+  document.getElementById("golesA").value = "";
+  document.getElementById("golesB").value = "";
+
+  cargarPartidos();
+};
+
+// EDITAR (RECLAMO)
+window.editar = async function(id) {
+
+  const opcion = prompt("1 = pierde A\n2 = pierde B");
+
+  let ga, gb;
+
+  if (opcion === "1") { ga = 0; gb = 1; }
+  else if (opcion === "2") { ga = 1; gb = 0; }
+  else return;
+
+  await updateDoc(doc(db, "partidos", id), {
+    ga, gb, tipo: "reclamo"
+  });
+
+  cargarPartidos();
+};
+
+// ELIMINAR PARTIDO
+window.eliminarPartido = async function(id) {
+  if (!confirm("Eliminar partido?")) return;
+  await deleteDoc(doc(db, "partidos", id));
+  cargarPartidos();
+};
+
+// LISTA PARTIDOS
+async function cargarPartidos() {
+  const cont = document.getElementById("listaPartidos");
+  const filtro = document.getElementById("filtroSerie").value;
+
+  cont.innerHTML = "";
+
+  const snap = await getDocs(collection(db, "partidos"));
+
+  let lista = [];
+  snap.forEach(d => lista.push({ id: d.id, ...d.data() }));
+
+  lista.sort((a, b) => b.fecha - a.fecha);
+
+  if (filtro !== "todas") {
+    lista = lista.filter(p => p.serie === filtro);
+  }
+
+  lista.forEach(p => {
+    cont.innerHTML += `
+      <div class="equipo">
+        ${p.serie} | ${p.equipoA} ${p.ga}-${p.gb} ${p.equipoB}
+        <div>
+          <span onclick="editar('${p.id}')">✏️</span>
+          <span class="eliminar" onclick="eliminarPartido('${p.id}')">X</span>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// INIT
+cargarEquipos();
+cargarSelectEquipos();
+cargarPartidos();
+
+document.getElementById("seriePartido").addEventListener("change", cargarSelectEquipos);
+document.getElementById("filtroSerie").addEventListener("change", cargarPartidos);
+
+</script>
+
+</body>
+</html>
