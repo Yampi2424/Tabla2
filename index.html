@@ -7,122 +7,56 @@
 
 <style>
 
-tr:first-child {
-  border-left: 4px solid var(--dorado);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--negro);
-  color: var(--blanco);
-}
-
-th {
-  background: var(--morado);
-  color: var(--blanco);
-  padding: 10px;
-  font-weight: bold;
-}
-
-td {
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #222;
-}
-
-tr:hover {
-  background: rgba(255,255,255,0.05);
-}
-
-button {
-  background: var(--gris);
-  color: var(--blanco);
-  border: none;
-  padding: 8px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-button:hover {
-  background: var(--morado);
-}
-
-button.activo {
-  background: var(--dorado);
-  color: var(--negro);
-  font-weight: bold;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: linear-gradient(90deg, var(--morado), var(--negro));
-  padding: 15px;
-  border-bottom: 3px solid var(--dorado);
-}
-
-.logo-liga {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-}
-
-.header h1 {
-  color: var(--blanco);
-  margin: 0;
-}
-
-.header p {
-  color: var(--dorado);
-  margin: 0;
-  font-size: 14px;
-}
-
+/* ===== VARIABLES ===== */
 :root {
   --morado: #5B2A86;
-  --morado-claro: #7B3FB5;
   --dorado: #D4AF37;
-  --negro: #0f0f0f;
+  --negro: #0b0b0f;
   --blanco: #ffffff;
   --gris: #1c1c1c;
-}
-
-.logo-equipo {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  border-radius: 50%;
-  background: #0b0b0f;
-  padding: 2px;
-}
-
-.club {
-  display: flex;
-  align-items: center;
 }
 
 /* ===== GENERAL ===== */
 body {
   margin: 0;
   font-family: system-ui, Arial;
-  background: #0b0b0f;
-  color: #fff;
+  background: var(--negro);
+  color: var(--blanco);
+  padding: 8px;
 }
 
-/* ===== HEADER ===== */
-header {
-  background: linear-gradient(135deg, #6a00ff, #9d00ff);
-  padding: 18px 10px;
-  text-align: center;
-  box-shadow: 0 4px 20px #000;
+/* ===== HEADER RESPONSIVE 🔥 ===== */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(90deg, var(--morado), var(--negro));
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid var(--dorado);
+  flex-wrap: wrap;
 }
 
-header h1 {
-  margin: 8px 0 0;
-  font-size: 18px;
+.logo-liga {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--dorado);
 }
 
 /* ===== SERIES ===== */
@@ -130,27 +64,27 @@ header h1 {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 12px;
+  padding: 10px 0;
 }
+
 .series::-webkit-scrollbar { display: none; }
 
 .serie-btn {
-  background: #1f1f2e;
+  background: var(--gris);
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 13px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .serie-btn.active {
-  background: linear-gradient(135deg, #6a00ff, #9d00ff);
+  background: var(--dorado);
+  color: black;
+  font-weight: bold;
 }
 
 /* ===== TABLA ===== */
-.container {
-  padding: 10px;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -160,29 +94,18 @@ table {
 }
 
 thead {
-  background: #1a1a2a;
+  background: var(--morado);
 }
 
-th {
-  font-size: 12px;
-  padding: 10px;
-  color: #aaa;
-}
-
-td {
-  padding: 10px;
-  font-size: 13px;
-}
-
-/* ===== ALINEACIÓN PERFECTA ===== */
 th, td {
+  padding: 8px;
+  font-size: 12px;
   text-align: center;
 }
 
 /* EXCEPCIONES */
 td:first-child {
   text-align: left;
-  padding-left: 10px;
   font-weight: bold;
 }
 
@@ -190,13 +113,19 @@ td:nth-child(2) {
   text-align: left;
 }
 
-/* ANCHOS */
-td:nth-child(n+3):nth-child(-n+10) {
-  width: 50px;
+/* ===== CLUB ===== */
+.club {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-td:last-child {
-  width: 150px;
+.logo-equipo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #000;
 }
 
 /* ===== FILAS ===== */
@@ -208,15 +137,6 @@ tr:hover {
   background: #1a1a26;
 }
 
-/* ===== CLUB ===== */
-.club {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-
-
 /* ===== PODIO ===== */
 tr:nth-child(1) td:first-child { color: gold; }
 tr:nth-child(2) td:first-child { color: silver; }
@@ -226,17 +146,17 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 .ultimos5 {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .forma {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: bold;
   color: white;
 }
@@ -249,8 +169,16 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 /* ===== MOBILE ===== */
 @media (max-width: 600px) {
   th, td {
-    font-size: 11px;
+    font-size: 10px;
     padding: 6px;
+  }
+
+  .header h1 {
+    font-size: 14px;
+  }
+
+  .header p {
+    font-size: 12px;
   }
 }
 
@@ -259,19 +187,16 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 
 <body>
 
-<header>
-  <div class="header">
+<div class="header">
   <img src="https://i.imgur.com/zy9TaG1.jpeg" class="logo-liga">
-  <div>
+  <div class="header-text">
     <h1>Liga Dávila Carlson</h1>
     <p>Apertura 2026</p>
   </div>
 </div>
-</header>
 
 <div class="series" id="series"></div>
 
-<div class="container">
 <table>
 <thead>
 <tr>
@@ -290,7 +215,6 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 </thead>
 <tbody id="tabla-body"></tbody>
 </table>
-</div>
 
 <script type="module">
 
@@ -347,7 +271,7 @@ async function cargarTabla() {
       tabla[e.nombre] = {
         nombre: e.nombre,
         logo: e.logo || "https://via.placeholder.com/30",
-        color: e.color || "#ffffff",
+        color: e.color || "#fff",
         PJ: 0, G: 0, E: 0, P: 0,
         GF: 0, GC: 0, PTS: 0,
         forma: []
@@ -380,20 +304,20 @@ async function cargarTabla() {
     if (p.ga > p.gb) {
       A.G++; A.PTS += 3;
       B.P++;
-      A.forma.push("✅");
-      B.forma.push("❌");
+      A.forma.push("W");
+      B.forma.push("L");
 
     } else if (p.ga < p.gb) {
       B.G++; B.PTS += 3;
       A.P++;
-      B.forma.push("✅");
-      A.forma.push("❌");
+      B.forma.push("W");
+      A.forma.push("L");
 
     } else {
       A.E++; B.E++;
       A.PTS++; B.PTS++;
-      A.forma.push("➖");
-      B.forma.push("➖");
+      A.forma.push("D");
+      B.forma.push("D");
     }
 
     if (A.forma.length > 5) A.forma.shift();
@@ -421,10 +345,10 @@ function mostrarTabla(lista) {
     tabla.innerHTML += `
     <tr>
       <td>${i+1}</td>
-<td class="club">
-  <img src="${e.logo}" class="logo-equipo">
-  <span style="color:${e.color}">${e.nombre}</span>
-</td>
+      <td class="club">
+        <img src="${e.logo}" class="logo-equipo">
+        <span style="color:${e.color}">${e.nombre}</span>
+      </td>
       <td>${e.PJ}</td>
       <td>${e.G}</td>
       <td>${e.E}</td>
@@ -436,9 +360,9 @@ function mostrarTabla(lista) {
       <td>
         <div class="ultimos5">
           ${e.forma.map(f => {
-            if (f === "✅") return `<div class="forma win">✓</div>`;
-            if (f === "❌") return `<div class="forma lose">✕</div>`;
-            if (f === "➖") return `<div class="forma draw">-</div>`;
+            if (f === "W") return `<div class="forma win">✓</div>`;
+            if (f === "L") return `<div class="forma lose">✕</div>`;
+            if (f === "D") return `<div class="forma draw">-</div>`;
             return `<div class="forma empty"></div>`;
           }).join("")}
         </div>
