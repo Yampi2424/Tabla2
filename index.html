@@ -25,7 +25,7 @@ body {
   padding: 8px;
 }
 
-/* ===== HEADER RESPONSIVE 🔥 ===== */
+/* ===== HEADER ===== */
 .header {
   display: flex;
   align-items: center;
@@ -34,18 +34,12 @@ body {
   padding: 12px;
   border-radius: 12px;
   border: 2px solid var(--dorado);
-  flex-wrap: wrap;
 }
 
 .logo-liga {
   width: 50px;
   height: 50px;
   object-fit: contain;
-}
-
-.header-text {
-  flex: 1;
-  min-width: 0;
 }
 
 .header h1 {
@@ -66,7 +60,6 @@ body {
   overflow-x: auto;
   padding: 10px 0;
 }
-
 .series::-webkit-scrollbar { display: none; }
 
 .serie-btn {
@@ -84,9 +77,16 @@ body {
   font-weight: bold;
 }
 
+/* ===== CONTENEDOR TABLA 🔥 ===== */
+.tabla-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
 /* ===== TABLA ===== */
 table {
   width: 100%;
+  min-width: 650px; /* 🔥 CLAVE: evita que se corte */
   border-collapse: collapse;
   background: #12121a;
   border-radius: 12px;
@@ -147,6 +147,7 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
   display: flex;
   justify-content: center;
   gap: 4px;
+  min-width: 90px; /* 🔥 CLAVE */
 }
 
 .forma {
@@ -189,7 +190,7 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 
 <div class="header">
   <img src="https://i.imgur.com/zy9TaG1.jpeg" class="logo-liga">
-  <div class="header-text">
+  <div>
     <h1>Liga Dávila Carlson</h1>
     <p>Apertura 2026</p>
   </div>
@@ -197,6 +198,8 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 
 <div class="series" id="series"></div>
 
+<!-- 🔥 SOLUCIÓN: ENVOLVER TABLA -->
+<div class="tabla-container">
 <table>
 <thead>
 <tr>
@@ -215,6 +218,7 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 </thead>
 <tbody id="tabla-body"></tbody>
 </table>
+</div>
 
 <script type="module">
 
@@ -222,12 +226,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBOHkkkQsDMcL9OxXjKg9YMcC6xM7kke1Q",
+  apiKey: "AQUI_TU_API_KEY",
   authDomain: "liga-davila.firebaseapp.com",
   projectId: "liga-davila",
-  storageBucket: "liga-davila.firebasestorage.app",
-  messagingSenderId: "674533365203",
-  appId: "1:674533365203:web:841cbe1f23f1efb6230b26"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -271,7 +272,6 @@ async function cargarTabla() {
       tabla[e.nombre] = {
         nombre: e.nombre,
         logo: e.logo || "https://via.placeholder.com/30",
-        color: e.color || "#fff",
         PJ: 0, G: 0, E: 0, P: 0,
         GF: 0, GC: 0, PTS: 0,
         forma: []
@@ -347,7 +347,7 @@ function mostrarTabla(lista) {
       <td>${i+1}</td>
       <td class="club">
         <img src="${e.logo}" class="logo-equipo">
-        <span style="color:${e.color}">${e.nombre}</span>
+        ${e.nombre}
       </td>
       <td>${e.PJ}</td>
       <td>${e.G}</td>
