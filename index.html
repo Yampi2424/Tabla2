@@ -298,14 +298,14 @@ async function cargarTabla() {
 
     A.PJ++; B.PJ++;
 
-    A.GF += p.golesA;
-    A.GC += p.golesB;
+    const ga = parseInt(p.ga);
+const gb = parseInt(p.gb);
 
-    B.GF += p.golesB;
-    B.GC += p.golesA;
-    
-    const ga = parseInt(p.golesA);
-    const gb = parseInt(p.golesB);
+A.GF += ga;
+A.GC += gb;
+
+B.GF += gb;
+B.GC += ga;
 
 if (ga > gb) {
   A.G++; A.PTS += 3;
