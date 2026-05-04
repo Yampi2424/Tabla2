@@ -16,20 +16,19 @@ const db = getFirestore(app);
 const SERIES = ["Sub-13","Sub-15","Sub-17","Primera","Segunda","Senior"];
 let serieActual = "Sub-13";
 
-// 🔥 datos en memoria
 let equiposGlobal = [];
 let partidosGlobal = [];
 
 export function iniciarTabla() {
   crearBotones();
 
-  // 🔥 escuchar equipos en tiempo real
+  // 🔥 equipos en tiempo real
   onSnapshot(collection(db, "equipos"), (snap) => {
     equiposGlobal = snap.docs.map(d => d.data());
     recalcular();
   });
 
-  // 🔥 escuchar partidos en tiempo real
+  // 🔥 partidos en tiempo real
   onSnapshot(collection(db, "partidos"), (snap) => {
     partidosGlobal = snap.docs.map(d => d.data());
     recalcular();
@@ -49,9 +48,13 @@ function crearBotones() {
 
     btn.onclick = () => {
       serieActual = serie;
-      document.querySelectorAll(".serie-btn").forEach(b => b.classList.remove("active"));
+
+      document.querySelectorAll(".serie-btn")
+        .forEach(b => b.classList.remove("active"));
+
       btn.classList.add("active");
-      recalcular(); // 🔥 importante
+
+      recalcular(); // 🔥 recalcula siempre
     };
 
     cont.appendChild(btn);
@@ -64,7 +67,7 @@ function recalcular() {
 
   let tabla = {};
 
-  // 🔥 crear equipos
+  // 🔥 crear base equipos
   equiposGlobal.forEach(e => {
     if (e.serie === serieActual) {
       tabla[e.nombre] = {
@@ -77,10 +80,12 @@ function recalcular() {
     }
   });
 
-  // 🔥 ordenar partidos por fecha
-  partidosGlobal.sort((a, b) => (a.fecha || 0) - (b.fecha || 0));
+  // 🔥 copiar y ordenar partidos (NO modificar el original)
+  const partidosOrdenados = [...partidosGlobal].sort(
+    (a, b) => (a.fecha || 0) - (b.fecha || 0)
+  );
 
-  partidosGlobal.forEach(p => {
+  partidosOrdenados.forEach(p => {
 
     if (p.serie !== serieActual) return;
 
@@ -123,9 +128,9 @@ function recalcular() {
     if (B.forma.length > 5) B.forma.shift();
   });
 
-  // 🔥 ordenar tabla
   let lista = Object.values(tabla);
 
+  // 🔥 ordenar por puntos + diferencia de gol
   lista.sort((a, b) =>
     b.PTS - a.PTS || (b.GF - b.GC) - (a.GF - a.GC)
   );
@@ -142,7 +147,7 @@ function mostrarTabla(lista) {
 
     while (e.forma.length < 5) e.forma.push("");
 
-    tabla.innerHTML += `
+    const fila = `
     <tr>
       <td>${i+1}</td>
       <td class="club">
@@ -169,5 +174,7 @@ function mostrarTabla(lista) {
       </td>
     </tr>
     `;
+
+    tabla.innerHTML += fila;
   });
 }
