@@ -289,7 +289,15 @@ function crearBotones() {
 async function cargarTabla() {
 
   const equiposSnap = await getDocs(collection(db, "equipos"));
-  const partidosSnap = await getDocs(collection(db, "partidos"));
+  import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+onSnapshot(collection(db, "partidos"), (snapshot) => {
+
+  let partidos = [];
+  snapshot.forEach(doc => partidos.push(doc.data()));
+
+  procesarTabla(partidos);
+});
 
   let tabla = {};
 
@@ -444,6 +452,82 @@ function toggleFecha(fecha) {
 crearBotones();
 cargarTabla();
 
+function procesarTabla(partidos) {
+
+  let tabla = {};
+
+  // volver a cargar equipos
+  getDocs(collection(db, "equipos")).then(equiposSnap => {
+
+    equiposSnap.forEach(doc => {
+      const e = doc.data();
+
+      if (e.serie === serieActual) {
+        tabla[e.nombre] = {
+          nombre: e.nombre,
+          logo: e.logo || "https://via.placeholder.com/30",
+          PJ: 0, G: 0, E: 0, P: 0,
+          GF: 0, GC: 0, PTS: 0,
+          forma: []
+        };
+      }
+    });
+
+    partidos.sort((a, b) => a.fecha - b.fecha);
+
+    partidos.forEach(p => {
+
+      if (p.serie !== serieActual) return;
+
+      const A = tabla[p.equipoA];
+      const B = tabla[p.equipoB];
+
+      if (!A || !B) return;
+
+      A.PJ++; B.PJ++;
+
+      A.GF += p.ga;
+      A.GC += p.gb;
+
+      B.GF += p.gb;
+      B.GC += p.ga;
+
+      if (p.ga > p.gb) {
+        A.G++; A.PTS += 3;
+        B.P++;
+        A.forma.push("W");
+        B.forma.push("L");
+
+      } else if (p.ga < p.gb) {
+        B.G++; B.PTS += 3;
+        A.P++;
+        B.forma.push("W");
+        A.forma.push("L");
+
+      } else {
+        A.E++; B.E++;
+        A.PTS++; B.PTS++;
+        A.forma.push("D");
+        B.forma.push("D");
+      }
+
+      if (A.forma.length > 5) A.forma.shift();
+      if (B.forma.length > 5) B.forma.shift();
+    });
+
+    let lista = Object.values(tabla);
+
+    lista.sort((a, b) =>
+      b.PTS - a.PTS ||
+      (b.GF - b.GC) - (a.GF - a.GC)
+    );
+
+    mostrarTabla(lista);
+    mostrarFechas(partidos);
+
+  });
+}
+  
 </script>
 
 </body>
