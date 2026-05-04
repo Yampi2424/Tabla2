@@ -329,7 +329,18 @@ if (ga > gb) {
 if (A.forma.length > 5) A.forma.shift();
 if (B.forma.length > 5) B.forma.shift();
 
-  mostrarTabla(lista);
+}); // 👈 CIERRA el forEach de partidos
+
+// 🔥 CREAR LISTA
+let lista = Object.values(tabla);
+
+// 🔥 ORDENAR TABLA
+lista.sort((a, b) => 
+  b.PTS - a.PTS || (b.GF - b.GC) - (a.GF - a.GC)
+);
+
+// 🔥 MOSTRAR TABLA
+mostrarTabla(lista);
 }
 
 function mostrarTabla(lista) {
