@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBOHkkkQsDMcL9OxXjKg9YMcC6xM7kke1Q",
@@ -16,16 +16,24 @@ const db = getFirestore(app);
 const SERIES = ["Sub-13","Sub-15","Sub-17","Primera","Segunda","Senior"];
 let serieActual = "Sub-13";
 
+// 🔥 datos en memoria
+let equiposGlobal = [];
+let partidosGlobal = [];
+
 export function iniciarTabla() {
   crearBotones();
 
-  // 🔥 ACTUALIZA AUTOMÁTICO CUANDO CAMBIAN LOS PARTIDOS
-  onSnapshot(collection(db, "partidos"), () => {
-    cargarTabla();
+  // 🔥 escuchar equipos en tiempo real
+  onSnapshot(collection(db, "equipos"), (snap) => {
+    equiposGlobal = snap.docs.map(d => d.data());
+    recalcular();
   });
 
-  // 🔥 carga inicial
-  cargarTabla();
+  // 🔥 escuchar partidos en tiempo real
+  onSnapshot(collection(db, "partidos"), (snap) => {
+    partidosGlobal = snap.docs.map(d => d.data());
+    recalcular();
+  });
 }
 
 function crearBotones() {
@@ -43,24 +51,21 @@ function crearBotones() {
       serieActual = serie;
       document.querySelectorAll(".serie-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      cargarTabla();
+      recalcular(); // 🔥 importante
     };
 
     cont.appendChild(btn);
   });
 }
 
-async function cargarTabla() {
+function recalcular() {
 
-  const equiposSnap = await getDocs(collection(db, "equipos"));
-  const partidosSnap = await getDocs(collection(db, "partidos"));
+  if (!equiposGlobal.length) return;
 
   let tabla = {};
 
-  // 🔥 CREAR EQUIPOS
-  equiposSnap.forEach(doc => {
-    const e = doc.data();
-
+  // 🔥 crear equipos
+  equiposGlobal.forEach(e => {
     if (e.serie === serieActual) {
       tabla[e.nombre] = {
         nombre: e.nombre,
@@ -72,13 +77,10 @@ async function cargarTabla() {
     }
   });
 
-  // 🔥 CARGAR PARTIDOS
-  let partidos = [];
-  partidosSnap.forEach(doc => partidos.push(doc.data()));
+  // 🔥 ordenar partidos por fecha
+  partidosGlobal.sort((a, b) => (a.fecha || 0) - (b.fecha || 0));
 
-  partidos.sort((a, b) => a.fecha - b.fecha);
-
-  partidos.forEach(p => {
+  partidosGlobal.forEach(p => {
 
     if (p.serie !== serieActual) return;
 
@@ -89,8 +91,8 @@ async function cargarTabla() {
 
     A.PJ++; B.PJ++;
 
-    const ga = parseInt(p.ga);
-    const gb = parseInt(p.gb);
+    const ga = parseInt(p.ga) || 0;
+    const gb = parseInt(p.gb) || 0;
 
     A.GF += ga;
     A.GC += gb;
@@ -121,7 +123,7 @@ async function cargarTabla() {
     if (B.forma.length > 5) B.forma.shift();
   });
 
-  // 🔥 ORDENAR TABLA
+  // 🔥 ordenar tabla
   let lista = Object.values(tabla);
 
   lista.sort((a, b) =>
@@ -169,4 +171,3 @@ function mostrarTabla(lista) {
     `;
   });
 }
-
