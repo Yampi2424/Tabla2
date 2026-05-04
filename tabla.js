@@ -4,7 +4,10 @@ import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstat
 const firebaseConfig = {
   apiKey: "AIzaSyBOHkkkQsDMcL9OxXjKg9YMcC6xM7kke1Q",
   authDomain: "liga-davila.firebaseapp.com",
-  projectId: "liga-davila"
+  projectId: "liga-davila",
+  storageBucket: "liga-davila.firebasestorage.app",
+  messagingSenderId: "674533365203",
+  appId: "1:674533365203:web:841cbe1f23f1efb6230b26"
 };
 
 const app = initializeApp(firebaseConfig);
