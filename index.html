@@ -192,14 +192,18 @@ function cargarTabla() {
       if (e.serie === serieActual) {
         tabla[e.nombre] = {
           nombre: e.nombre,
+          logo: e.logo || "https://via.placeholder.com/30",
           PJ: 0, G: 0, E: 0, P: 0,
-          GF: 0, GC: 0, PTS: 0
+          GF: 0, GC: 0, PTS: 0,
+          forma: []
         };
       }
     });
 
     let partidos = [];
     snapshot.forEach(doc => partidos.push(doc.data()));
+
+    partidos.sort((a, b) => a.fecha - b.fecha);
 
     partidos.forEach(p => {
 
@@ -221,18 +225,32 @@ function cargarTabla() {
       if (p.ga > p.gb) {
         A.G++; A.PTS += 3;
         B.P++;
+        A.forma.push("W");
+        B.forma.push("L");
+
       } else if (p.ga < p.gb) {
         B.G++; B.PTS += 3;
         A.P++;
+        B.forma.push("W");
+        A.forma.push("L");
+
       } else {
         A.E++; B.E++;
         A.PTS++; B.PTS++;
+        A.forma.push("D");
+        B.forma.push("D");
       }
+
+      if (A.forma.length > 5) A.forma.shift();
+      if (B.forma.length > 5) B.forma.shift();
     });
 
     let lista = Object.values(tabla);
 
-    lista.sort((a, b) => b.PTS - a.PTS);
+    lista.sort((a, b) =>
+      b.PTS - a.PTS ||
+      (b.GF - b.GC) - (a.GF - a.GC)
+    );
 
     mostrarTabla(lista);
     mostrarFechas(partidos);
@@ -244,10 +262,16 @@ function mostrarTabla(lista) {
   tabla.innerHTML = "";
 
   lista.forEach((e, i) => {
+
+    while (e.forma.length < 5) e.forma.push("");
+
     tabla.innerHTML += `
     <tr>
       <td>${i+1}</td>
-      <td>${e.nombre}</td>
+      <td class="club">
+        <img src="${e.logo}" class="logo-equipo">
+        ${e.nombre}
+      </td>
       <td>${e.PJ}</td>
       <td>${e.G}</td>
       <td>${e.E}</td>
@@ -255,8 +279,19 @@ function mostrarTabla(lista) {
       <td>${e.GF}</td>
       <td>${e.GC}</td>
       <td>${e.GF - e.GC}</td>
-      <td>${e.PTS}</td>
-    </tr>`;
+      <td><b>${e.PTS}</b></td>
+      <td>
+        <div class="ultimos5">
+          ${e.forma.map(f => {
+            if (f === "W") return `<div class="forma win">✓</div>`;
+            if (f === "L") return `<div class="forma lose">✕</div>`;
+            if (f === "D") return `<div class="forma draw">-</div>`;
+            return `<div class="forma empty"></div>`;
+          }).join("")}
+        </div>
+      </td>
+    </tr>
+    `;
   });
 }
 
@@ -265,6 +300,8 @@ function mostrarFechas(partidos) {
   const container = document.getElementById("fechasContainer");
   container.innerHTML = "";
 
+  partidos = partidos.filter(p => p.serie === serieActual);
+
   const fechas = {};
 
   partidos.forEach(p => {
@@ -272,7 +309,7 @@ function mostrarFechas(partidos) {
     fechas[p.fecha].push(p);
   });
 
-  Object.keys(fechas).forEach(fecha => {
+  Object.keys(fechas).sort((a,b)=>a-b).forEach(fecha => {
 
     const div = document.createElement("div");
 
@@ -280,9 +317,12 @@ function mostrarFechas(partidos) {
       <button class="fecha-btn" onclick="toggleFecha(${fecha})">
         Fecha ${fecha}
       </button>
+
       <div class="fecha-contenido" id="fecha-${fecha}">
         ${fechas[fecha].map(p => `
-          <div>${p.equipoA} ${p.ga} - ${p.gb} ${p.equipoB}</div>
+          <div class="partido">
+            ${p.equipoA} ${p.ga} - ${p.gb} ${p.equipoB}
+          </div>
         `).join("")}
       </div>
     `;
