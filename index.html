@@ -298,41 +298,36 @@ async function cargarTabla() {
 
     A.PJ++; B.PJ++;
 
-    A.GF += p.ga;
-    A.GC += p.gb;
+    A.GF += p.golesA;
+    A.GC += p.golesB;
 
-    B.GF += p.gb;
-    B.GC += p.ga;
+    B.GF += p.golesB;
+    B.GC += p.golesA;
+    
+    const ga = parseInt(p.golesA);
+    const gb = parseInt(p.golesB);
 
-    if (p.ga > p.gb) {
-      A.G++; A.PTS += 3;
-      B.P++;
-      A.forma.push("W");
-      B.forma.push("L");
+if (ga > gb) {
+  A.G++; A.PTS += 3;
+  B.P++;
+  A.forma.push("W");
+  B.forma.push("L");
 
-    } else if (p.ga < p.gb) {
-      B.G++; B.PTS += 3;
-      A.P++;
-      B.forma.push("W");
-      A.forma.push("L");
+} else if (ga < gb) {
+  B.G++; B.PTS += 3;
+  A.P++;
+  B.forma.push("W");
+  A.forma.push("L");
 
-    } else {
-      A.E++; B.E++;
-      A.PTS++; B.PTS++;
-      A.forma.push("D");
-      B.forma.push("D");
-    }
+} else {
+  A.E++; B.E++;
+  A.PTS++; B.PTS++;
+  A.forma.push("D");
+  B.forma.push("D");
+}
 
-    if (A.forma.length > 5) A.forma.shift();
-    if (B.forma.length > 5) B.forma.shift();
-  });
-
-  let lista = Object.values(tabla);
-
-  lista.sort((a, b) =>
-    b.PTS - a.PTS ||
-    (b.GF - b.GC) - (a.GF - a.GC)
-  );
+if (A.forma.length > 5) A.forma.shift();
+if (B.forma.length > 5) B.forma.shift();
 
   mostrarTabla(lista);
 }
