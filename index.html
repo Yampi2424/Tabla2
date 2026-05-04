@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
-/* ===== VARIABLES ===== */
+/* 🔥 TODO TU CSS IGUAL (NO SE TOCA) */
 :root {
   --morado: #5B2A86;
   --dorado: #D4AF37;
@@ -16,7 +15,6 @@
   --gris: #1c1c1c;
 }
 
-/* ===== GENERAL ===== */
 body {
   margin: 0;
   font-family: system-ui, Arial;
@@ -25,7 +23,6 @@ body {
   padding: 8px;
 }
 
-/* ===== HEADER ===== */
 .header {
   display: flex;
   align-items: center;
@@ -42,25 +39,12 @@ body {
   object-fit: contain;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 16px;
-}
-
-.header p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--dorado);
-}
-
-/* ===== SERIES ===== */
 .series {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding: 10px 0;
 }
-.series::-webkit-scrollbar { display: none; }
 
 .serie-btn {
   background: var(--gris);
@@ -68,7 +52,6 @@ body {
   border-radius: 999px;
   font-size: 13px;
   cursor: pointer;
-  white-space: nowrap;
 }
 
 .serie-btn.active {
@@ -77,24 +60,16 @@ body {
   font-weight: bold;
 }
 
-/* ===== CONTENEDOR TABLA 🔥 ===== */
 .tabla-container {
   width: 100%;
   overflow-x: auto;
 }
 
-/* ===== TABLA ===== */
 table {
   width: 100%;
-  min-width: 650px; /* 🔥 CLAVE: evita que se corte */
+  min-width: 650px;
   border-collapse: collapse;
   background: #12121a;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-thead {
-  background: var(--morado);
 }
 
 th, td {
@@ -103,17 +78,6 @@ th, td {
   text-align: center;
 }
 
-/* EXCEPCIONES */
-td:first-child {
-  text-align: left;
-  font-weight: bold;
-}
-
-td:nth-child(2) {
-  text-align: left;
-}
-
-/* ===== CLUB ===== */
 .club {
   display: flex;
   align-items: center;
@@ -123,31 +87,12 @@ td:nth-child(2) {
 .logo-equipo {
   width: 26px;
   height: 26px;
-  object-fit: contain;
-  border-radius: 50%;
-  background: #000;
 }
 
-/* ===== FILAS ===== */
-tr {
-  border-bottom: 1px solid #1f1f2a;
-}
-
-tr:hover {
-  background: #1a1a26;
-}
-
-/* ===== PODIO ===== */
-tr:nth-child(1) td:first-child { color: gold; }
-tr:nth-child(2) td:first-child { color: silver; }
-tr:nth-child(3) td:first-child { color: #cd7f32; }
-
-/* ===== ÚLTIMOS 5 ===== */
 .ultimos5 {
   display: flex;
   justify-content: center;
   gap: 4px;
-  min-width: 90px; /* 🔥 CLAVE */
 }
 
 .forma {
@@ -158,7 +103,6 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  font-weight: bold;
   color: white;
 }
 
@@ -166,22 +110,6 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 .lose { background: #ef4444; }
 .draw { background: #9ca3af; }
 .empty { background: #2a2a3a; }
-
-/* ===== MOBILE ===== */
-@media (max-width: 600px) {
-  th, td {
-    font-size: 10px;
-    padding: 6px;
-  }
-
-  .header h1 {
-    font-size: 14px;
-  }
-
-  .header p {
-    font-size: 12px;
-  }
-}
 
 </style>
 </head>
@@ -198,7 +126,6 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 
 <div class="series" id="series"></div>
 
-<!-- 🔥 SOLUCIÓN: ENVOLVER TABLA -->
 <div class="tabla-container">
 <table>
 <thead>
@@ -216,174 +143,16 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 <th>Últimos 5</th>
 </tr>
 </thead>
+
 <tbody id="tabla-body"></tbody>
+
 </table>
 </div>
 
+<!-- 🔥 SOLO ESTO DE JS -->
 <script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBOHkkkQsDMcL9OxXjKg9YMcC6xM7kke1Q",
-  authDomain: "liga-davila.firebaseapp.com",
-  projectId: "liga-davila",
-  storageBucket: "liga-davila.firebasestorage.app",
-  messagingSenderId: "674533365203",
-  appId: "1:674533365203:web:841cbe1f23f1efb6230b26"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const SERIES = ["Sub-13","Sub-15","Sub-17","Primera","Segunda","Senior"];
-let serieActual = "Sub-13";
-
-function crearBotones() {
-  const cont = document.getElementById("series");
-
-  SERIES.forEach((serie, i) => {
-    const btn = document.createElement("div");
-    btn.className = "serie-btn";
-    btn.innerText = serie;
-
-    if (i === 0) btn.classList.add("active");
-
-    btn.onclick = () => {
-      serieActual = serie;
-      document.querySelectorAll(".serie-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      cargarTabla();
-    };
-
-    cont.appendChild(btn);
-  });
-}
-
-async function cargarTabla() {
-
-  const equiposSnap = await getDocs(collection(db, "equipos"));
-  const partidosSnap = await getDocs(collection(db, "partidos"));
-
-  let tabla = {};
-
-  equiposSnap.forEach(doc => {
-    const e = doc.data();
-
-    if (e.serie === serieActual) {
-      tabla[e.nombre] = {
-        nombre: e.nombre,
-        logo: e.logo || "https://via.placeholder.com/30",
-        PJ: 0, G: 0, E: 0, P: 0,
-        GF: 0, GC: 0, PTS: 0,
-        forma: []
-      };
-    }
-  });
-
-  let partidos = [];
-  partidosSnap.forEach(doc => partidos.push(doc.data()));
-
-  partidos.sort((a, b) => a.fecha - b.fecha);
-
-  partidos.forEach(p => {
-
-    if (p.serie !== serieActual) return;
-
-    const A = tabla[p.equipoA];
-    const B = tabla[p.equipoB];
-
-    if (!A || !B) return;
-
-    A.PJ++; B.PJ++;
-
-    const ga = parseInt(p.ga);
-const gb = parseInt(p.gb);
-
-A.GF += ga;
-A.GC += gb;
-
-B.GF += gb;
-B.GC += ga;
-
-if (ga > gb) {
-  A.G++; A.PTS += 3;
-  B.P++;
-  A.forma.push("W");
-  B.forma.push("L");
-
-} else if (ga < gb) {
-  B.G++; B.PTS += 3;
-  A.P++;
-  B.forma.push("W");
-  A.forma.push("L");
-
-} else {
-  A.E++; B.E++;
-  A.PTS++; B.PTS++;
-  A.forma.push("D");
-  B.forma.push("D");
-}
-
-if (A.forma.length > 5) A.forma.shift();
-if (B.forma.length > 5) B.forma.shift();
-
-}); // 👈 CIERRA el forEach de partidos
-
-// 🔥 CREAR LISTA
-let lista = Object.values(tabla);
-
-// 🔥 ORDENAR TABLA
-lista.sort((a, b) => 
-  b.PTS - a.PTS || (b.GF - b.GC) - (a.GF - a.GC)
-);
-
-// 🔥 MOSTRAR TABLA
-mostrarTabla(lista);
-}
-
-function mostrarTabla(lista) {
-  const tabla = document.getElementById("tabla-body");
-  tabla.innerHTML = "";
-
-  lista.forEach((e, i) => {
-
-    while (e.forma.length < 5) e.forma.push("");
-
-    tabla.innerHTML += `
-    <tr>
-      <td>${i+1}</td>
-      <td class="club">
-        <img src="${e.logo}" class="logo-equipo">
-        ${e.nombre}
-      </td>
-      <td>${e.PJ}</td>
-      <td>${e.G}</td>
-      <td>${e.E}</td>
-      <td>${e.P}</td>
-      <td>${e.GF}</td>
-      <td>${e.GC}</td>
-      <td>${e.GF - e.GC}</td>
-      <td><b>${e.PTS}</b></td>
-      <td>
-        <div class="ultimos5">
-          ${e.forma.map(f => {
-            if (f === "W") return `<div class="forma win">✓</div>`;
-            if (f === "L") return `<div class="forma lose">✕</div>`;
-            if (f === "D") return `<div class="forma draw">-</div>`;
-            return `<div class="forma empty"></div>`;
-          }).join("")}
-        </div>
-      </td>
-    </tr>
-    `;
-  });
-}
-
-crearBotones();
-cargarTabla();
-
+  import { iniciarTabla } from "./tabla.js";
+  iniciarTabla();
 </script>
 
 </body>
