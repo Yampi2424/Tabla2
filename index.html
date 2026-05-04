@@ -7,6 +7,29 @@
 
 <style>
 
+  .fecha-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--morado);
+  color: white;
+  border: none;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.fecha-contenido {
+  display: none;
+  padding: 10px;
+  background: #111;
+  border-radius: 8px;
+}
+
+.partido {
+  padding: 6px;
+  border-bottom: 1px solid #333;
+}
+
 /* ===== VARIABLES ===== */
 :root {
   --morado: #5B2A86;
@@ -220,6 +243,8 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 </table>
 </div>
 
+<div id="fechasContainer"></div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -332,6 +357,7 @@ async function cargarTabla() {
   );
 
   mostrarTabla(lista);
+mostrarFechas(partidos);
 }
 
 function mostrarTabla(lista) {
@@ -371,7 +397,47 @@ function mostrarTabla(lista) {
     `;
   });
 }
+function mostrarFechas(partidos) {
 
+  const container = document.getElementById("fechasContainer");
+  container.innerHTML = "";
+
+  partidos = partidos.filter(p => p.serie === serieActual);
+
+  const fechas = {};
+
+  partidos.forEach(p => {
+    if (!fechas[p.fecha]) fechas[p.fecha] = [];
+    fechas[p.fecha].push(p);
+  });
+
+  Object.keys(fechas).sort((a,b)=>a-b).forEach(fecha => {
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <button class="fecha-btn" onclick="toggleFecha(${fecha})">
+        Fecha ${fecha}
+      </button>
+
+      <div class="fecha-contenido" id="fecha-${fecha}">
+        ${fechas[fecha].map(p => `
+          <div class="partido">
+            ${p.equipoA} ${p.ga} - ${p.gb} ${p.equipoB}
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function toggleFecha(fecha) {
+  const el = document.getElementById(`fecha-${fecha}`);
+  el.style.display = el.style.display === "block" ? "none" : "block";
+}
+  
 crearBotones();
 cargarTabla();
 
