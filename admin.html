@@ -46,6 +46,15 @@ button {
   border-radius: 5px;
 }
 
+  .serie-titulo {
+  background: #6a00ff;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+} 
+  
 .eliminar {
   background: red;
   padding: 5px 10px;
@@ -172,13 +181,40 @@ async function cargarEquipos() {
 
   const snap = await getDocs(collection(db, "equipos"));
 
+  let equipos = [];
+
+  // guardar todos
   snap.forEach(d => {
-    const data = d.data();
+    equipos.push({ id: d.id, ...d.data() });
+  });
+
+  // agrupar por serie
+  const agrupados = {};
+
+  equipos.forEach(eq => {
+    if (!agrupados[eq.serie]) {
+      agrupados[eq.serie] = [];
+    }
+    agrupados[eq.serie].push(eq);
+  });
+
+  // pintar ordenado
+  SERIES.forEach(serie => {
+
+    if (!agrupados[serie]) return;
 
     lista.innerHTML += `
-      <div class="equipo">
-        ${data.nombre} (${data.serie})
-        <span class="eliminar" onclick="eliminar('${d.id}')">X</span>
+      <div class="serie-titulo" onclick="toggleSerie('${serie}')">
+        ▶ ${serie}
+      </div>
+
+      <div id="serie-${serie}" style="display:none; margin-left:10px;">
+        ${agrupados[serie].map(eq => `
+          <div class="equipo">
+            ${eq.nombre}
+            <span class="eliminar" onclick="eliminar('${eq.id}')">X</span>
+          </div>
+        `).join("")}
       </div>
     `;
   });
@@ -269,6 +305,7 @@ window.eliminarPartido = async function(id) {
 
 // LISTA PARTIDOS
 async function cargarPartidos() {
+  
   const cont = document.getElementById("listaPartidos");
   const filtro = document.getElementById("filtroSerie").value;
 
@@ -298,6 +335,12 @@ async function cargarPartidos() {
   });
 }
 
+
+  window.toggleSerie = function(serie) {
+  const div = document.getElementById("serie-" + serie);
+  div.style.display = div.style.display === "none" ? "block" : "none";
+};
+  
 // INIT
 cargarEquipos();
 cargarSelectEquipos();
