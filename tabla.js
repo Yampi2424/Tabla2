@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBOHkkkQsDMcL9OxXjKg9YMcC6xM7kke1Q",
@@ -15,11 +15,19 @@ let serieActual = "Sub-13";
 
 export function iniciarTabla() {
   crearBotones();
+
+  // 🔥 ACTUALIZA AUTOMÁTICO CUANDO CAMBIAN LOS PARTIDOS
+  onSnapshot(collection(db, "partidos"), () => {
+    cargarTabla();
+  });
+
+  // 🔥 carga inicial
   cargarTabla();
 }
 
 function crearBotones() {
   const cont = document.getElementById("series");
+  cont.innerHTML = "";
 
   SERIES.forEach((serie, i) => {
     const btn = document.createElement("div");
@@ -46,13 +54,14 @@ async function cargarTabla() {
 
   let tabla = {};
 
+  // 🔥 CREAR EQUIPOS
   equiposSnap.forEach(doc => {
     const e = doc.data();
 
     if (e.serie === serieActual) {
       tabla[e.nombre] = {
         nombre: e.nombre,
-        logo: e.logo,
+        logo: e.logo || "https://via.placeholder.com/30",
         PJ: 0, G: 0, E: 0, P: 0,
         GF: 0, GC: 0, PTS: 0,
         forma: []
@@ -60,6 +69,7 @@ async function cargarTabla() {
     }
   });
 
+  // 🔥 CARGAR PARTIDOS
   let partidos = [];
   partidosSnap.forEach(doc => partidos.push(doc.data()));
 
@@ -90,11 +100,13 @@ async function cargarTabla() {
       B.P++;
       A.forma.push("W");
       B.forma.push("L");
+
     } else if (ga < gb) {
       B.G++; B.PTS += 3;
       A.P++;
       B.forma.push("W");
       A.forma.push("L");
+
     } else {
       A.E++; B.E++;
       A.PTS++; B.PTS++;
@@ -106,6 +118,7 @@ async function cargarTabla() {
     if (B.forma.length > 5) B.forma.shift();
   });
 
+  // 🔥 ORDENAR TABLA
   let lista = Object.values(tabla);
 
   lista.sort((a, b) =>
