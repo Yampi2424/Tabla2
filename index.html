@@ -7,29 +7,6 @@
 
 <style>
 
-  .fecha-btn {
-  width: 100%;
-  padding: 12px;
-  background: var(--morado);
-  color: white;
-  border: none;
-  margin-top: 10px;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-.fecha-contenido {
-  display: none;
-  padding: 10px;
-  background: #111;
-  border-radius: 8px;
-}
-
-.partido {
-  padding: 6px;
-  border-bottom: 1px solid #333;
-}
-
 /* ===== VARIABLES ===== */
 :root {
   --morado: #5B2A86;
@@ -65,78 +42,41 @@ body {
   object-fit: contain;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 16px;
-}
-
-.header p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--dorado);
-}
-
 /* ===== SERIES ===== */
 .series {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 10px 0;
 }
-.series::-webkit-scrollbar { display: none; }
 
 .serie-btn {
   background: var(--gris);
   padding: 8px 14px;
   border-radius: 999px;
-  font-size: 13px;
   cursor: pointer;
-  white-space: nowrap;
 }
 
 .serie-btn.active {
   background: var(--dorado);
   color: black;
-  font-weight: bold;
-}
-
-/* ===== CONTENEDOR TABLA 🔥 ===== */
-.tabla-container {
-  width: 100%;
-  overflow-x: auto;
 }
 
 /* ===== TABLA ===== */
-table {
-  width: 100%;
-  min-width: 650px; /* 🔥 CLAVE: evita que se corte */
-  border-collapse: collapse;
-  background: #12121a;
-  border-radius: 12px;
-  overflow: hidden;
+.tabla-container {
+  overflow-x: auto;
 }
 
-thead {
-  background: var(--morado);
+table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
 }
 
 th, td {
   padding: 8px;
-  font-size: 12px;
   text-align: center;
 }
 
-/* EXCEPCIONES */
-td:first-child {
-  text-align: left;
-  font-weight: bold;
-}
-
-td:nth-child(2) {
-  text-align: left;
-}
-
-/* ===== CLUB ===== */
 .club {
   display: flex;
   align-items: center;
@@ -146,64 +86,21 @@ td:nth-child(2) {
 .logo-equipo {
   width: 26px;
   height: 26px;
-  object-fit: contain;
-  border-radius: 50%;
-  background: #000;
 }
 
-/* ===== FILAS ===== */
-tr {
-  border-bottom: 1px solid #1f1f2a;
-}
-
-tr:hover {
-  background: #1a1a26;
-}
-
-/* ===== PODIO ===== */
-tr:nth-child(1) td:first-child { color: gold; }
-tr:nth-child(2) td:first-child { color: silver; }
-tr:nth-child(3) td:first-child { color: #cd7f32; }
-
-/* ===== ÚLTIMOS 5 ===== */
-.ultimos5 {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  min-width: 90px; /* 🔥 CLAVE */
-}
-
-.forma {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
+/* ===== FECHAS ===== */
+.fecha-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--morado);
+  border: none;
   color: white;
+  margin-top: 10px;
 }
 
-.win { background: #22c55e; }
-.lose { background: #ef4444; }
-.draw { background: #9ca3af; }
-.empty { background: #2a2a3a; }
-
-/* ===== MOBILE ===== */
-@media (max-width: 600px) {
-  th, td {
-    font-size: 10px;
-    padding: 6px;
-  }
-
-  .header h1 {
-    font-size: 14px;
-  }
-
-  .header p {
-    font-size: 12px;
-  }
+.fecha-contenido {
+  display: none;
+  padding: 10px;
 }
 
 </style>
@@ -221,7 +118,6 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 
 <div class="series" id="series"></div>
 
-<!-- 🔥 SOLUCIÓN: ENVOLVER TABLA -->
 <div class="tabla-container">
 <table>
 <thead>
@@ -236,7 +132,6 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 <th>GC</th>
 <th>DG</th>
 <th>PTS</th>
-<th>Últimos 5</th>
 </tr>
 </thead>
 <tbody id="tabla-body"></tbody>
@@ -248,15 +143,12 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyBOHkkkQsDMcL9OxXjKg9YMcC6xM7kke1Q",
   authDomain: "liga-davila.firebaseapp.com",
-  projectId: "liga-davila",
-  storageBucket: "liga-davila.firebasestorage.app",
-  messagingSenderId: "674533365203",
-  appId: "1:674533365203:web:841cbe1f23f1efb6230b26"
+  projectId: "liga-davila"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -286,178 +178,13 @@ function crearBotones() {
   });
 }
 
-async function cargarTabla() {
+function cargarTabla() {
 
-  const equiposSnap = await getDocs(collection(db, "equipos"));
-  import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  onSnapshot(collection(db, "partidos"), async (snapshot) => {
 
-onSnapshot(collection(db, "partidos"), (snapshot) => {
+    const equiposSnap = await getDocs(collection(db, "equipos"));
 
-  let partidos = [];
-  snapshot.forEach(doc => partidos.push(doc.data()));
-
-  procesarTabla(partidos);
-});
-
-  let tabla = {};
-
-  equiposSnap.forEach(doc => {
-    const e = doc.data();
-
-    if (e.serie === serieActual) {
-      tabla[e.nombre] = {
-        nombre: e.nombre,
-        logo: e.logo || "https://via.placeholder.com/30",
-        PJ: 0, G: 0, E: 0, P: 0,
-        GF: 0, GC: 0, PTS: 0,
-        forma: []
-      };
-    }
-  });
-
-  let partidos = [];
-  partidosSnap.forEach(doc => partidos.push(doc.data()));
-
-  partidos.sort((a, b) => a.fecha - b.fecha);
-
-  partidos.forEach(p => {
-
-    if (p.serie !== serieActual) return;
-
-    const A = tabla[p.equipoA];
-    const B = tabla[p.equipoB];
-
-    if (!A || !B) return;
-
-    A.PJ++; B.PJ++;
-
-    A.GF += p.ga;
-    A.GC += p.gb;
-
-    B.GF += p.gb;
-    B.GC += p.ga;
-
-    if (p.ga > p.gb) {
-      A.G++; A.PTS += 3;
-      B.P++;
-      A.forma.push("W");
-      B.forma.push("L");
-
-    } else if (p.ga < p.gb) {
-      B.G++; B.PTS += 3;
-      A.P++;
-      B.forma.push("W");
-      A.forma.push("L");
-
-    } else {
-      A.E++; B.E++;
-      A.PTS++; B.PTS++;
-      A.forma.push("D");
-      B.forma.push("D");
-    }
-
-    if (A.forma.length > 5) A.forma.shift();
-    if (B.forma.length > 5) B.forma.shift();
-  });
-
-  let lista = Object.values(tabla);
-
-  lista.sort((a, b) =>
-    b.PTS - a.PTS ||
-    (b.GF - b.GC) - (a.GF - a.GC)
-  );
-
-  mostrarTabla(lista);
-mostrarFechas(partidos);
-}
-
-function mostrarTabla(lista) {
-  const tabla = document.getElementById("tabla-body");
-  tabla.innerHTML = "";
-
-  lista.forEach((e, i) => {
-
-    while (e.forma.length < 5) e.forma.push("");
-
-    tabla.innerHTML += `
-    <tr>
-      <td>${i+1}</td>
-      <td class="club">
-        <img src="${e.logo}" class="logo-equipo">
-        ${e.nombre}
-      </td>
-      <td>${e.PJ}</td>
-      <td>${e.G}</td>
-      <td>${e.E}</td>
-      <td>${e.P}</td>
-      <td>${e.GF}</td>
-      <td>${e.GC}</td>
-      <td>${e.GF - e.GC}</td>
-      <td><b>${e.PTS}</b></td>
-      <td>
-        <div class="ultimos5">
-          ${e.forma.map(f => {
-            if (f === "W") return `<div class="forma win">✓</div>`;
-            if (f === "L") return `<div class="forma lose">✕</div>`;
-            if (f === "D") return `<div class="forma draw">-</div>`;
-            return `<div class="forma empty"></div>`;
-          }).join("")}
-        </div>
-      </td>
-    </tr>
-    `;
-  });
-}
-function mostrarFechas(partidos) {
-
-  const container = document.getElementById("fechasContainer");
-  container.innerHTML = "";
-
-  partidos = partidos.filter(p => p.serie === serieActual);
-
-  const fechas = {};
-
-  partidos.forEach(p => {
-    if (!fechas[p.fecha]) fechas[p.fecha] = [];
-    fechas[p.fecha].push(p);
-  });
-
-  Object.keys(fechas).sort((a,b)=>a-b).forEach(fecha => {
-
-    const div = document.createElement("div");
-
-    div.innerHTML = `
-      <button class="fecha-btn" onclick="toggleFecha(${fecha})">
-        Fecha ${fecha}
-      </button>
-
-      <div class="fecha-contenido" id="fecha-${fecha}">
-        ${fechas[fecha].map(p => `
-          <div class="partido">
-            ${p.equipoA} ${p.ga} - ${p.gb} ${p.equipoB}
-          </div>
-        `).join("")}
-      </div>
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-function toggleFecha(fecha) {
-  const el = document.getElementById(`fecha-${fecha}`);
-  el.style.display = el.style.display === "block" ? "none" : "block";
-}
-  
-crearBotones();
-cargarTabla();
-
-function procesarTabla(partidos) {
-
-  let tabla = {};
-
-  // volver a cargar equipos
-  getDocs(collection(db, "equipos")).then(equiposSnap => {
+    let tabla = {};
 
     equiposSnap.forEach(doc => {
       const e = doc.data();
@@ -465,15 +192,14 @@ function procesarTabla(partidos) {
       if (e.serie === serieActual) {
         tabla[e.nombre] = {
           nombre: e.nombre,
-          logo: e.logo || "https://via.placeholder.com/30",
           PJ: 0, G: 0, E: 0, P: 0,
-          GF: 0, GC: 0, PTS: 0,
-          forma: []
+          GF: 0, GC: 0, PTS: 0
         };
       }
     });
 
-    partidos.sort((a, b) => a.fecha - b.fecha);
+    let partidos = [];
+    snapshot.forEach(doc => partidos.push(doc.data()));
 
     partidos.forEach(p => {
 
@@ -495,39 +221,84 @@ function procesarTabla(partidos) {
       if (p.ga > p.gb) {
         A.G++; A.PTS += 3;
         B.P++;
-        A.forma.push("W");
-        B.forma.push("L");
-
       } else if (p.ga < p.gb) {
         B.G++; B.PTS += 3;
         A.P++;
-        B.forma.push("W");
-        A.forma.push("L");
-
       } else {
         A.E++; B.E++;
         A.PTS++; B.PTS++;
-        A.forma.push("D");
-        B.forma.push("D");
       }
-
-      if (A.forma.length > 5) A.forma.shift();
-      if (B.forma.length > 5) B.forma.shift();
     });
 
     let lista = Object.values(tabla);
 
-    lista.sort((a, b) =>
-      b.PTS - a.PTS ||
-      (b.GF - b.GC) - (a.GF - a.GC)
-    );
+    lista.sort((a, b) => b.PTS - a.PTS);
 
     mostrarTabla(lista);
     mostrarFechas(partidos);
-
   });
 }
-  
+
+function mostrarTabla(lista) {
+  const tabla = document.getElementById("tabla-body");
+  tabla.innerHTML = "";
+
+  lista.forEach((e, i) => {
+    tabla.innerHTML += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${e.nombre}</td>
+      <td>${e.PJ}</td>
+      <td>${e.G}</td>
+      <td>${e.E}</td>
+      <td>${e.P}</td>
+      <td>${e.GF}</td>
+      <td>${e.GC}</td>
+      <td>${e.GF - e.GC}</td>
+      <td>${e.PTS}</td>
+    </tr>`;
+  });
+}
+
+function mostrarFechas(partidos) {
+
+  const container = document.getElementById("fechasContainer");
+  container.innerHTML = "";
+
+  const fechas = {};
+
+  partidos.forEach(p => {
+    if (!fechas[p.fecha]) fechas[p.fecha] = [];
+    fechas[p.fecha].push(p);
+  });
+
+  Object.keys(fechas).forEach(fecha => {
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <button class="fecha-btn" onclick="toggleFecha(${fecha})">
+        Fecha ${fecha}
+      </button>
+      <div class="fecha-contenido" id="fecha-${fecha}">
+        ${fechas[fecha].map(p => `
+          <div>${p.equipoA} ${p.ga} - ${p.gb} ${p.equipoB}</div>
+        `).join("")}
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+window.toggleFecha = function(fecha) {
+  const el = document.getElementById(`fecha-${fecha}`);
+  el.style.display = el.style.display === "block" ? "none" : "block";
+};
+
+crearBotones();
+cargarTabla();
+
 </script>
 
 </body>
