@@ -106,7 +106,7 @@ button {
   <select id="equipoB"></select>
   <input type="number" id="golesB" placeholder="Goles equipo B">
 
-  <input type="datetime-local" id="fechaPartido">
+  <input type="number" id="fechaNumero" placeholder="Fecha (1, 2, 3...)">
 
   <select id="tipo">
     <option value="normal">Resultado normal</option>
@@ -211,6 +211,8 @@ async function cargarEquipos() {
       <div id="serie-${serie}" style="display:none; margin-left:10px;">
         ${agrupados[serie].map(eq => `
           <div class="equipo">
+          
+          
             ${eq.nombre}
             <span class="eliminar" onclick="eliminar('${eq.id}')">X</span>
           </div>
@@ -257,9 +259,10 @@ window.crearPartido = async function () {
   let gb = parseInt(document.getElementById("golesB").value);
 
   const tipo = document.getElementById("tipo").value;
-  const fechaInput = document.getElementById("fechaPartido").value;
+  
+  const fecha = parseInt(document.getElementById("fechaNumero").value);
 
-  const fecha = fechaInput ? new Date(fechaInput).getTime() : Date.now();
+  if (!fecha) return alert("Ingresa número de fecha");
 
   if (A === B) return alert("Equipos iguales");
 
