@@ -226,9 +226,21 @@ const equipoB = mapaEquipos[norm(p.equipoB)];
       const div = document.createElement("div");
       div.className = "partido";
 
-      div.innerHTML = `
+      const tipo = (p.tipo || "").toLowerCase().trim();
+
+let extra = "";
+
+if (tipo === "reclamo") {
+  extra = ' <span class="reclamo">(Reclamo)</span>';
+} else if (tipo === "woA" || tipo === "woB") {
+  extra = ' <span class="wo">(W.O)</span>';
+}
+
+div.innerHTML = `
   <span>${equipoA?.nombre || p.equipoA}</span>
-  <div class="score">${p.ga} - ${p.gb}</div>
+  <div class="score">
+    ${p.ga} - ${p.gb}${extra}
+  </div>
   <span>${equipoB?.nombre || p.equipoB}</span>
 `;
 
