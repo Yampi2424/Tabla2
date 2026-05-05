@@ -164,3 +164,47 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
     font-size: 12px;
   }
 }
+
+
+.partidos {
+  margin-top: 20px;
+}
+
+.fecha {
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #151521;
+  overflow: hidden;
+}
+
+.fecha-header {
+  padding: 10px;
+  background: var(--morado);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.partidos-lista {
+  padding: 10px;
+  display: none;
+}
+
+.partido {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.partido img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.score {
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+}
