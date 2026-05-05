@@ -181,3 +181,57 @@ function mostrarTabla(lista) {
   });
 }
 
+function renderPartidos(partidos, equipos) {
+
+  const cont = document.getElementById("partidos-container");
+  cont.innerHTML = '<div class="partidos"></div>';
+
+  const wrapper = cont.querySelector(".partidos");
+
+  // 🔥 agrupar por fecha
+  let fechas = {};
+
+  partidos.forEach(p => {
+    if (p.serie !== serieActual) return;
+
+    if (!fechas[p.fecha]) fechas[p.fecha] = [];
+    fechas[p.fecha].push(p);
+  });
+
+  Object.keys(fechas).sort().forEach(f => {
+
+    const fechaDiv = document.createElement("div");
+    fechaDiv.className = "fecha";
+
+    fechaDiv.innerHTML = `
+      <div class="fecha-header">Fecha ${f}</div>
+      <div class="partidos-lista"></div>
+    `;
+
+    const lista = fechaDiv.querySelector(".partidos-lista");
+
+    fechas[f].forEach(p => {
+
+      const equipoA = equipos.find(e => e.nombre === p.equipoA);
+      const equipoB = equipos.find(e => e.nombre === p.equipoB);
+
+      const div = document.createElement("div");
+      div.className = "partido";
+
+      div.innerHTML = `
+        <img src="${equipoA?.logo}">
+        <div class="score">${p.ga} - ${p.gb}</div>
+        <img src="${equipoB?.logo}">
+      `;
+
+      lista.appendChild(div);
+    });
+
+    // 🔽 desplegable
+    fechaDiv.querySelector(".fecha-header").onclick = () => {
+      lista.style.display = lista.style.display === "block" ? "none" : "block";
+    };
+
+    wrapper.appendChild(fechaDiv);
+  });
+}
