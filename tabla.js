@@ -19,16 +19,19 @@ let serieActual = "Sub-13";
 let equiposGlobal = [];
 let partidosGlobal = [];
 
+// 🔥 función clave (normalizar texto)
+const norm = (txt) => (txt || "").toString().trim().toLowerCase();
+
 export function iniciarTabla() {
   crearBotones();
 
-  // 🔥 equipos en tiempo real
+  // 🔥 equipos
   onSnapshot(collection(db, "equipos"), (snap) => {
     equiposGlobal = snap.docs.map(d => d.data());
     recalcular();
   });
 
-  // 🔥 partidos en tiempo real
+  // 🔥 partidos
   onSnapshot(collection(db, "partidos"), (snap) => {
     partidosGlobal = snap.docs.map(d => d.data());
     recalcular();
@@ -48,13 +51,9 @@ function crearBotones() {
 
     btn.onclick = () => {
       serieActual = serie;
-
-      document.querySelectorAll(".serie-btn")
-        .forEach(b => b.classList.remove("active"));
-
+      document.querySelectorAll(".serie-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-
-      recalcular(); // 🔥 recalcula siempre
+      recalcular();
     };
 
     cont.appendChild(btn);
@@ -67,10 +66,13 @@ function recalcular() {
 
   let tabla = {};
 
-  // 🔥 crear base equipos
+  // 🔥 crear base con nombre NORMALIZADO como clave
   equiposGlobal.forEach(e => {
-    if (e.serie === serieActual) {
-      tabla[e.nombre] = {
+    if (norm(e.serie) === norm(serieActual)) {
+
+      const key = norm(e.nombre);
+
+      tabla[key] = {
         nombre: e.nombre,
         logo: e.logo || "https://via.placeholder.com/30",
         PJ: 0, G: 0, E: 0, P: 0,
@@ -80,27 +82,22 @@ function recalcular() {
     }
   });
 
-  // 🔥 copiar y ordenar partidos (NO modificar el original)
+  // 🔥 ordenar partidos sin romper original
   const partidosOrdenados = [...partidosGlobal].sort(
     (a, b) => (a.fecha || 0) - (b.fecha || 0)
   );
 
   partidosOrdenados.forEach(p => {
 
-    if (p.serie?.trim().toLowerCase() !== serieActual.toLowerCase()) return;
+    if (norm(p.serie) !== norm(serieActual)) return;
 
-    const nombreA = p.equipoA?.trim();
-const nombreB = p.equipoB?.trim();
-
-const A = tabla[nombreA];
-const B = tabla[nombreB];
+    const A = tabla[norm(p.equipoA)];
+    const B = tabla[norm(p.equipoB)];
 
     if (!A || !B) {
-  console.log("❌ NO COINCIDE:", nombreA, nombreB);
-  return;
-}
-
-    if (!A || !B) return;
+      console.log("❌ equipo no encontrado:", p.equipoA, p.equipoB);
+      return;
+    }
 
     A.PJ++; B.PJ++;
 
@@ -138,7 +135,6 @@ const B = tabla[nombreB];
 
   let lista = Object.values(tabla);
 
-  // 🔥 ordenar por puntos + diferencia de gol
   lista.sort((a, b) =>
     b.PTS - a.PTS || (b.GF - b.GC) - (a.GF - a.GC)
   );
@@ -155,7 +151,7 @@ function mostrarTabla(lista) {
 
     while (e.forma.length < 5) e.forma.push("");
 
-    const fila = `
+    tabla.innerHTML += `
     <tr>
       <td>${i+1}</td>
       <td class="club">
@@ -182,7 +178,5 @@ function mostrarTabla(lista) {
       </td>
     </tr>
     `;
-
-    tabla.innerHTML += fila;
   });
 }
