@@ -140,7 +140,7 @@ function recalcular() {
   );
 
   mostrarTabla(lista);
-renderPartidos(partidos, equiposSnap.docs.map(d => d.data()));
+renderPartidos(partidosGlobal, equiposGlobal);
 }
 
 function mostrarTabla(lista) {
@@ -193,7 +193,7 @@ function renderPartidos(partidos, equipos) {
   let fechas = {};
 
   partidos.forEach(p => {
-    if (p.serie !== serieActual) return;
+    if (norm(p.serie) !== norm(serieActual)) return;
 
     if (!fechas[p.fecha]) fechas[p.fecha] = [];
     fechas[p.fecha].push(p);
