@@ -89,7 +89,7 @@ function recalcular() {
 
   partidosOrdenados.forEach(p => {
 
-    if (!norm(p.serie).includes(norm(serieActual))) return;
+    if (norm(p.serie) !== norm(serieActual)) return;
 
     const A = tabla[norm(p.equipoA)];
     const B = tabla[norm(p.equipoB)];
@@ -200,10 +200,7 @@ equipos.forEach(e => {
   
   partidos.forEach(p => {
 
-  const seriePartido = norm(p.serie).replace(/[^0-9]/g, "");
-  const serieActualNum = norm(serieActual).replace(/[^0-9]/g, "");
-
-  if (seriePartido !== serieActualNum) return;
+  if (norm(p.serie) !== norm(serieActual)) return;
 
   if (!fechas[p.fecha]) fechas[p.fecha] = [];
   fechas[p.fecha].push(p);
