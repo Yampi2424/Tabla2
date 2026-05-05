@@ -89,11 +89,16 @@ function recalcular() {
 
     if (p.serie?.trim().toLowerCase() !== serieActual.toLowerCase()) return;
 
-    const nombreA = p.equipoA?.trim().toLowerCase();
-    const nombreB = p.equipoB?.trim().toLowerCase();
+    const nombreA = p.equipoA?.trim();
+const nombreB = p.equipoB?.trim();
 
-const A = Object.values(tabla).find(e => e.nombre.toLowerCase() === nombreA);
-const B = Object.values(tabla).find(e => e.nombre.toLowerCase() === nombreB);
+const A = tabla[nombreA];
+const B = tabla[nombreB];
+
+    if (!A || !B) {
+  console.log("❌ NO COINCIDE:", nombreA, nombreB);
+  return;
+}
 
     if (!A || !B) return;
 
