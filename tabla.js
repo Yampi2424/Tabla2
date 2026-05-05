@@ -232,7 +232,7 @@ let extra = "";
 
 if (tipo === "reclamo") {
   extra = ' <span class="reclamo">(Reclamo)</span>';
-} else if (tipo === "woA" || tipo === "woB") {
+} else if (tipo === "woa" || tipo === "wob") {
   extra = ' <span class="wo">(W.O)</span>';
 }
 
