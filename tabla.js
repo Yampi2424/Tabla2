@@ -193,11 +193,15 @@ function renderPartidos(partidos, equipos) {
   let fechas = {};
 
   partidos.forEach(p => {
-  
 
-    if (!fechas[p.fecha]) fechas[p.fecha] = [];
-    fechas[p.fecha].push(p);
-  });
+  const seriePartido = norm(p.serie).replace(/[^0-9]/g, "");
+  const serieActualNum = norm(serieActual).replace(/[^0-9]/g, "");
+
+  if (seriePartido !== serieActualNum) return;
+
+  if (!fechas[p.fecha]) fechas[p.fecha] = [];
+  fechas[p.fecha].push(p);
+});
 
   Object.keys(fechas).sort().forEach(f => {
 
