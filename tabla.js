@@ -193,7 +193,7 @@ function renderPartidos(partidos, equipos) {
   let fechas = {};
 
   partidos.forEach(p => {
-    if (norm(p.serie) !== norm(serieActual)) return;
+  
 
     if (!fechas[p.fecha]) fechas[p.fecha] = [];
     fechas[p.fecha].push(p);
