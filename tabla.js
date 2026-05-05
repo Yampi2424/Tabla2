@@ -230,10 +230,10 @@ const equipoB = mapaEquipos[norm(p.equipoB)];
       div.className = "partido";
 
       div.innerHTML = `
-        <img src="${equipoA?.logo}">
-        <div class="score">${p.ga} - ${p.gb}</div>
-        <img src="${equipoB?.logo}">
-      `;
+  <span>${equipoA?.nombre || p.equipoA}</span>
+  <div class="score">${p.ga} - ${p.gb}</div>
+  <span>${equipoB?.nombre || p.equipoB}</span>
+`;
 
       lista.appendChild(div);
     });
