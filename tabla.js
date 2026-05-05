@@ -140,6 +140,7 @@ function recalcular() {
   );
 
   mostrarTabla(lista);
+renderPartidos(partidos, equiposSnap.docs.map(d => d.data()));
 }
 
 function mostrarTabla(lista) {
