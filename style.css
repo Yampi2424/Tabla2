@@ -208,3 +208,9 @@ tr:nth-child(3) td:first-child { color: #cd7f32; }
   min-width: 40px;
   text-align: center;
 }
+
+.partido span {
+  width: 90px;
+  text-align: center;
+  font-size: 12px;
+}
