@@ -192,6 +192,12 @@ function renderPartidos(partidos, equipos) {
   // 🔥 agrupar por fecha
   let fechas = {};
 
+const mapaEquipos = {};
+
+equipos.forEach(e => {
+  mapaEquipos[norm(e.nombre)] = e;
+});
+  
   partidos.forEach(p => {
 
   const seriePartido = norm(p.serie).replace(/[^0-9]/g, "");
@@ -217,8 +223,8 @@ function renderPartidos(partidos, equipos) {
 
     fechas[f].forEach(p => {
 
-      const equipoA = equipos.find(e => e.nombre === p.equipoA);
-      const equipoB = equipos.find(e => e.nombre === p.equipoB);
+      const equipoA = mapaEquipos[norm(p.equipoA)];
+const equipoB = mapaEquipos[norm(p.equipoB)];
 
       const div = document.createElement("div");
       div.className = "partido";
