@@ -239,9 +239,10 @@ if (tipo === "reclamo") {
 div.innerHTML = `
   <span>${equipoA?.nombre || p.equipoA}</span>
   <div class="score">
-    ${p.ga} - ${p.gb}${extra}
-  </div>
+  ${p.ga} - ${p.gb}
+</div>
   <span>${equipoB?.nombre || p.equipoB}</span>
+  ${extra}
 `;
 
       lista.appendChild(div);
