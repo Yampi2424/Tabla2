@@ -89,7 +89,7 @@ function recalcular() {
 
   partidosOrdenados.forEach(p => {
 
-    if (norm(p.serie) !== norm(serieActual)) return;
+    if (!norm(p.serie).includes(norm(serieActual))) return;
 
     const A = tabla[norm(p.equipoA)];
     const B = tabla[norm(p.equipoB)];
